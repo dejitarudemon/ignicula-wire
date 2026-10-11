@@ -149,7 +149,7 @@ if err := hs.Encode(&out, nil); err != nil {
 }
 ```
 
-Build the server reply with `NewHandshakeAnswer` or `frame.Frame{RequestID: 0, Body: bodies.NewHandshakeAnswer(nil)}`. Later requests must use a non-zero `RequestID`.
+Build the server reply with `NewHandshakeAnswer(compressions, versions)` or `frame.Frame{RequestID: 0, Body: bodies.NewHandshakeAnswer(nil, []fields.Version{1})}`. `versions` are protocol versions granted for use without re-authentication. Later requests must use a non-zero `RequestID`.
 
 ## 3. Write and read
 

@@ -37,9 +37,9 @@ var roundTripFrames = []struct {
 	{"handshake", frame.Frame{RequestID: 0, Body: bodies.NewHandshake("test", testHash, []fields.Compression{fields.Zstd})}},
 	{"handshake duplicate compressions", frame.Frame{RequestID: 0, Body: bodies.NewHandshake("test", testHash, []fields.Compression{fields.Zstd, fields.Zstd})}},
 	{"handshake unknown compression", frame.Frame{RequestID: 0, Body: bodies.NewHandshake("test", testHash, []fields.Compression{fields.Zstd, fields.Compression(23)})}},
-	{"handshake answer empty", frame.Frame{RequestID: 0, Body: bodies.NewHandshakeAnswer([]fields.Compression{})}},
-	{"handshake answer", frame.Frame{RequestID: 0, Body: bodies.NewHandshakeAnswer([]fields.Compression{fields.Zstd})}},
-	{"handshake answer unknown compression", frame.Frame{RequestID: 0, Body: bodies.NewHandshakeAnswer([]fields.Compression{fields.Zstd, fields.Compression(23)})}},
+	{"handshake answer empty", frame.Frame{RequestID: 0, Body: bodies.NewHandshakeAnswer([]fields.Compression{}, nil)}},
+	{"handshake answer", frame.Frame{RequestID: 0, Body: bodies.NewHandshakeAnswer([]fields.Compression{fields.Zstd}, []fields.Version{1})}},
+	{"handshake answer unknown compression", frame.Frame{RequestID: 0, Body: bodies.NewHandshakeAnswer([]fields.Compression{fields.Zstd, fields.Compression(23)}, []fields.Version{1})}},
 
 	{"read empty key", frame.Frame{RequestID: 1, Body: bodies.Read("")}},
 	{"read", frame.Frame{RequestID: 1, Body: bodies.Read("key")}},

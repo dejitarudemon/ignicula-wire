@@ -39,15 +39,15 @@ func NewHandshake(login string, hash [32]byte, compressions []fields.Compression
 	}
 }
 
-// filter drops fields.None and duplicate compression codes.
-func filter(compressions []fields.Compression) []fields.Compression {
-	filtered := make([]fields.Compression, 0, len(compressions))
-	used := make(map[fields.Compression]struct{}, len(compressions))
+// filter drops zeros and duplicate values.
+func filter[T ~uint8](values []T) []T {
+	filtered := make([]T, 0, len(values))
+	used := make(map[T]struct{}, len(values))
 
-	for _, compression := range compressions {
-		if _, ok := used[compression]; !ok && compression != fields.None {
-			used[compression] = struct{}{}
-			filtered = append(filtered, compression)
+	for _, value := range values {
+		if _, ok := used[value]; !ok && value != 0 {
+			used[value] = struct{}{}
+			filtered = append(filtered, value)
 		}
 	}
 
@@ -58,7 +58,7 @@ func filter(compressions []fields.Compression) []fields.Compression {
 func (h Handshake) Size() int {
 	size := min(len(h.Compressions), MaxCompressionsPerOneHandshake)
 
-	return LoginLenFieldSize + cap(h.Hash) + len(h.Login) + fields.CompressionFieldSize + size*fields.CompressionFieldSize
+	return LoginLenFieldSize + cap(h.Hash) + len(h.Login) + CompressionLenFieldSize + size*fields.CompressionFieldSize
 }
 
 // Encode writes the wire encoding of the body into buf.
@@ -88,7 +88,7 @@ func (h Handshake) Command() fields.Command {
 func (h Handshake) IsValid() error {
 	if len(h.Compressions) > MaxCompressionsPerOneHandshake {
 		return err.NewValidationError(
-			"too many fieldss",
+			"too many compressions",
 			"compressions", len(h.Compressions),
 			"target", h.Command(),
 		)

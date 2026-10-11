@@ -140,7 +140,12 @@ func (d Decoder) answerHandshake(c *cursor) (bodies.HandshakeAnswer, error) {
 		return bodies.HandshakeAnswer{}, e
 	}
 
-	return bodies.NewHandshakeAnswer(compressions), nil
+	versions, e := d.decodeVersions(c)
+	if e != nil {
+		return bodies.HandshakeAnswer{}, e
+	}
+
+	return bodies.NewHandshakeAnswer(compressions, versions), nil
 }
 
 // answerRead decodes a read answer payload.

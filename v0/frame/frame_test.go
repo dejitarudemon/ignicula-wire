@@ -121,7 +121,6 @@ func TestFrame_IsValid(t *testing.T) {
 	}{
 		{"nil body", frame.Frame{}},
 		{"version 0", frame.Frame{Body: bodies.Hello{Versions: []fields.Version{0}}}},
-		{"oversized version", frame.Frame{Body: bodies.Hello{Versions: []fields.Version{256}}}},
 		{"too many versions", frame.Frame{Body: bodies.Hello{Versions: tooMany}}},
 	}
 

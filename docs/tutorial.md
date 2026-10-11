@@ -149,7 +149,7 @@ if err := hs.Encode(&out, nil); err != nil {
 }
 ```
 
-Ответ сервера — `NewHandshakeAnswer` или `frame.Frame{RequestID: 0, Body: bodies.NewHandshakeAnswer(nil)}`. Дальше `RequestID` должен быть ненулевым.
+Ответ сервера — `NewHandshakeAnswer(compressions, versions)` или `frame.Frame{RequestID: 0, Body: bodies.NewHandshakeAnswer(nil, []fields.Version{1})}`. `versions` — версии протокола, которыми можно пользоваться без повторной авторизации. Дальше `RequestID` должен быть ненулевым.
 
 ## 3. Запись и чтение
 

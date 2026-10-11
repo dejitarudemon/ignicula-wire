@@ -61,6 +61,26 @@ func (d Decoder) decodeCompressions(c *cursor) ([]fields.Compression, error) {
 	return compressions, nil
 }
 
+// decodeVersions reads a one-byte count followed by that many protocol versions.
+func (d Decoder) decodeVersions(c *cursor) ([]fields.Version, error) {
+	n, e := c.uint8()
+	if e != nil {
+		return nil, e
+	}
+
+	raw, e := c.bytes(int(n) * fields.VersionFieldSize)
+	if e != nil {
+		return nil, e
+	}
+
+	versions := make([]fields.Version, 0, n)
+	for _, b := range raw {
+		versions = append(versions, fields.Version(b))
+	}
+
+	return versions, nil
+}
+
 // write decodes a write body.
 func (d Decoder) write(c *cursor) (bodies.Write, error) {
 	key, e := d.decodeLengthPrefixed(c)

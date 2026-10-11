@@ -890,19 +890,21 @@ In that case the server sends an Answer request containing the following headers
 In the Body the server transmits data in the following format:
 
 ```text
-| 01 | 00 | Supported Compressions Len | Compression 1 | Compression 2 | ... | Compression N |
+| 01 | 00 | Supported Compressions Len | Compression 1 | Compression 2 | ... | Compression N | Granted Versions Len | Version 1 | Version 2 | ... | Version N |
 ```
 
 Where:
 
 - `Supported Compression Len` — the number of supported compression methods from the list provided by the client. Takes values from 0 to 255.
 - `Compression N` — the compression algorithms supported by the server.
+- `Granted Versions Len` — the number of versions the server allows without re-authentication. Takes values from 0 to 255.
+- `Version N` — a version granted for use without re-authentication.
 
-Example Answer request with Zstd support:
+Example Answer request with Zstd support and access to version 1:
 
 ```text
 Hex:
-0A DB 01 01 00 00 00 00 00 00 00 00 04 01 00 01 01 1B 08 33 19
+0A DB 01 01 00 00 00 00 00 00 00 00 06 01 00 01 01 01 01 52 6E 3E 35
 
 Decode:
 	Version: 1
@@ -912,7 +914,8 @@ Decode:
 	Result: OK
 	Responded To: Handshake
 	Supported compression algorithms: Zstd
-	CheckSum: 1B 08 33 19
+	Granted versions: 1
+	CheckSum: 52 6E 3E 35
 ```
 
 2. Request with problems

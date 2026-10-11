@@ -24,7 +24,7 @@ client                         server
 1. The client opens TCP (and TLS if the server requires it) **before** Hello.
 2. Both nodes exchange version-0 Hello frames and take the intersection of the lists. Version 0 is not a working version.
 3. The client sends Handshake (`RequestID = 0`) with a login, an Argon2id hash, and offered compression algorithms.
-4. The server replies with a Handshake Answer or a protocol error.
+4. The server replies with a Handshake Answer (accepted compressions and versions usable without re-authentication) or a protocol error.
 5. Working commands follow. One frame has one `RequestID`. Several requests may be in flight at once.
 
 If there are no common versions, the client closes the connection. After a drop, every unfinished request is considered unsuccessful.
