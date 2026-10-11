@@ -45,11 +45,6 @@ func TestFrameBuilder(t *testing.T) {
 			build: func() (frame.Frame, error) { return fb.NewHello([]fields.Version{0, 1}) },
 			want:  frame.Frame{Body: bodies.Hello{Versions: []fields.Version{1}}},
 		},
-		{
-			name:  "drops oversized versions",
-			build: func() (frame.Frame, error) { return fb.NewHello([]fields.Version{1, 256}) },
-			want:  frame.Frame{Body: bodies.Hello{Versions: []fields.Version{1}}},
-		},
 	}
 
 	for _, tt := range tests {

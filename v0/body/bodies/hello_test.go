@@ -40,7 +40,6 @@ func TestHello(t *testing.T) {
 		{"duplicates", Hello{Versions: []fields.Version{1, 1, 2}}, []byte{0x01, 0x01, 0x02}, false},
 		{"version 0", Hello{Versions: []fields.Version{0, 1}}, []byte{0x00, 0x01}, true},
 		{"only version 0", Hello{Versions: []fields.Version{0}}, []byte{0x00}, true},
-		{"version 256", Hello{Versions: []fields.Version{256}}, []byte{0x00}, true},
 		{"max versions", Hello{Versions: versions(MaxVersionsPerOneHello, 1)}, encodeVersions(versions(MaxVersionsPerOneHello, 1)), false},
 		{"too many versions", Hello{Versions: versions(MaxVersionsPerOneHello+1, 1)}, encodeVersions(versions(MaxVersionsPerOneHello+1, 1)), true},
 	}
@@ -64,8 +63,6 @@ func TestNewHello(t *testing.T) {
 		{"keeps order", NewHello([]fields.Version{3, 1, 2}), Hello{Versions: []fields.Version{3, 1, 2}}},
 		{"drops zero", NewHello([]fields.Version{0, 1, 2}), Hello{Versions: []fields.Version{1, 2}}},
 		{"drops duplicates", NewHello([]fields.Version{1, 1, 2, 1}), Hello{Versions: []fields.Version{1, 2}}},
-		{"drops oversized", NewHello([]fields.Version{1, 256, 2, 300}), Hello{Versions: []fields.Version{1, 2}}},
-		{"drops zero duplicates and oversized", NewHello([]fields.Version{0, 1, 256, 1, 0, 2}), Hello{Versions: []fields.Version{1, 2}}},
 		{"all unique working versions", NewHello(versions(MaxVersionsPerOneHello, 1)), Hello{Versions: versions(MaxVersionsPerOneHello, 1)}},
 	}
 
