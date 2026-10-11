@@ -5,7 +5,7 @@ import (
 )
 
 // Version is a protocol version number written in the frame preamble.
-type Version uint32
+type Version uint8
 
 const (
 	// VersionFieldSize is the encoded size in bytes of a [Version].
