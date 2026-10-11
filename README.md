@@ -114,7 +114,7 @@ func serve(c net.Conn) {
 	if _, ok := hs.Body.(bodies.Handshake); !ok {
 		return
 	}
-	ans, err := fb1.NewHandshakeAnswer(nil)
+	ans, err := fb1.NewHandshakeAnswer(nil, []fields.Version{1})
 	if err != nil {
 		return
 	}
@@ -303,7 +303,7 @@ func serve(c net.Conn) {
 	if _, ok := hs.Body.(bodies.Handshake); !ok {
 		return
 	}
-	ans, err := fb1.NewHandshakeAnswer(nil)
+	ans, err := fb1.NewHandshakeAnswer(nil, []fields.Version{1})
 	if err != nil {
 		return
 	}

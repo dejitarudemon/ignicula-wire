@@ -890,19 +890,21 @@ Hex-версия:
 В Body сервер передаёт данные в следующем формате:
 
 ```text
-| 01 | 00 | Supported Compressions Len | Compression 1 | Compression 2 | ... | Compression N |
+| 01 | 00 | Supported Compressions Len | Compression 1 | Compression 2 | ... | Compression N | Granted Versions Len | Version 1 | Version 2 | ... | Version N |
 ```
 
 Где:
 
 - `Supported Compression Len` — количество поддерживаемых методов сжатия из списка, предоставленного клиентом. Принимает значения от 0 до 255.
 - `Compression N` — поддерживаемые сервером алгоритмы сжатия.
+- `Granted Versions Len` — количество версий, которые сервер позволяет использовать без повторной авторизации. Принимает значения от 0 до 255.
+- `Version N` — версия, к которой предоставлен доступ без повторной авторизации.
 
-Пример Answer-запроса с поддержкой Zstd:
+Пример Answer-запроса с поддержкой Zstd и доступом к версии 1:
 
 ```text
 Hex-версия:
-0A DB 01 01 00 00 00 00 00 00 00 00 04 01 00 01 01 1B 08 33 19
+0A DB 01 01 00 00 00 00 00 00 00 00 06 01 00 01 01 01 01 52 6E 3E 35
 
 Расшифровка:
 	Version: 1
@@ -912,7 +914,8 @@ Hex-версия:
 	Result: OK
 	Responded To: Handshake
 	Supported compression algorithms: Zstd
-	CheckSum: 1B 08 33 19
+	Granted versions: 1
+	CheckSum: 52 6E 3E 35
 ```
 
 2. Запрос с проблемами

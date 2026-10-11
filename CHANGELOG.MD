@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.0 - 2026-10-11
+
+Added:
+
+- Handshake Answer lists granted protocol versions the client may use without re-authentication
+
+Changed:
+
+- `fields.Version` is `uint8` (was `uint32`) in both v0 and v1
+
 ## 1.1.0 - 2026-10-09
 
 Changed:
