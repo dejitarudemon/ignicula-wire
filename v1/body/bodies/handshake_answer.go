@@ -9,24 +9,39 @@ import (
 
 var _ body.Answer = HandshakeAnswer{}
 
-// HandshakeAnswer is a successful reply to [fields.Handshake] listing accepted compressions.
+const (
+	// VersionLenFieldSize is the encoded size in bytes of the granted-versions count.
+	VersionLenFieldSize = 1
+	// MaxVersionsPerOneHandshakeAnswer is the maximum number of granted versions in one handshake answer.
+	MaxVersionsPerOneHandshakeAnswer = 255
+)
+
+// HandshakeAnswer is a successful reply to [fields.Handshake].
+// It lists accepted compressions and protocol versions the client may use without re-authenticating.
 type HandshakeAnswer struct {
 	// Compressions lists compression algorithms the server accepts.
 	Compressions []fields.Compression
+	// Versions lists protocol versions granted for use without re-authentication.
+	Versions []fields.Version
 }
 
-// NewHandshakeAnswer returns a HandshakeAnswer after dropping [fields.None] and duplicate compression codes.
-func NewHandshakeAnswer(compressions []fields.Compression) HandshakeAnswer {
+// NewHandshakeAnswer returns a HandshakeAnswer after dropping zeros and duplicates
+// from compressions and versions.
+func NewHandshakeAnswer(compressions []fields.Compression, versions []fields.Version) HandshakeAnswer {
 	return HandshakeAnswer{
 		Compressions: filter(compressions),
+		Versions:     filter(versions),
 	}
 }
 
 // Size returns the encoded body size in bytes.
 func (h HandshakeAnswer) Size() int {
-	size := min(len(h.Compressions), MaxCompressionsPerOneHandshake)
+	compressions := min(len(h.Compressions), MaxCompressionsPerOneHandshake)
+	versions := min(len(h.Versions), MaxVersionsPerOneHandshakeAnswer)
 
-	return ResultFieldSize + fields.CompressionFieldSize + size*fields.CompressionFieldSize + h.IsResponseTo().Size()
+	size := ResultFieldSize + CompressionLenFieldSize + VersionLenFieldSize + h.IsResponseTo().Size()
+
+	return size + compressions*fields.CompressionFieldSize + versions*fields.VersionFieldSize
 }
 
 // Encode writes the wire encoding of the body into buf.
@@ -41,6 +56,16 @@ func (h HandshakeAnswer) Encode(buf buffer.Appender) {
 		}
 
 		compression.Encode(buf)
+	}
+
+	buf.AppendUint8(uint8(min(len(h.Versions), MaxVersionsPerOneHandshakeAnswer)))
+
+	for i, version := range h.Versions {
+		if i >= MaxVersionsPerOneHandshakeAnswer {
+			break
+		}
+
+		version.Encode(buf)
 	}
 }
 
@@ -57,11 +82,20 @@ func (h HandshakeAnswer) IsResponseTo() fields.Command {
 // IsValid reports whether the body satisfies protocol rules.
 // Compression codes are not checked because custom algorithms are allowed.
 // The compression list must not exceed [MaxCompressionsPerOneHandshake].
+// The versions list must not exceed [MaxVersionsPerOneHandshakeAnswer].
 func (h HandshakeAnswer) IsValid() error {
 	if len(h.Compressions) > MaxCompressionsPerOneHandshake {
 		return err.NewValidationError(
 			"too many compressions",
 			"compressions", len(h.Compressions),
+			"target", h.Command(),
+		)
+	}
+
+	if len(h.Versions) > MaxVersionsPerOneHandshakeAnswer {
+		return err.NewValidationError(
+			"too many versions",
+			"versions", len(h.Versions),
 			"target", h.Command(),
 		)
 	}

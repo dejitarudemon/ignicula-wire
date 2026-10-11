@@ -121,8 +121,8 @@ func TestDecoder_answer_OK(t *testing.T) {
 		{"write", bodies.WriteAnswer{}},
 		{"delete", bodies.DeleteAnswer{}},
 		{"read", bodies.ReadAnswer{Value: values.JSON(`{}`)}},
-		{"handshake", bodies.NewHandshakeAnswer([]fields.Compression{fields.S2})},
-		{"handshake without compressions", bodies.NewHandshakeAnswer(nil)},
+		{"handshake", bodies.NewHandshakeAnswer([]fields.Compression{fields.S2}, []fields.Version{1})},
+		{"handshake without compressions", bodies.NewHandshakeAnswer(nil, nil)},
 		{"batch empty", bodies.BatchAnswer{}},
 		{"batch", bodies.BatchAnswer{
 			{Number: 0, Body: bodies.ReadAnswer{Value: values.Uint(1)}},

@@ -61,11 +61,13 @@ func (fb FrameBuilder) NewHandshake(login string, hash [32]byte, compressions []
 }
 
 // NewHandshakeAnswer returns a handshake answer frame with request ID 0.
+// compressions are algorithms the server accepts; versions are protocol versions
+// granted for use without re-authentication.
 // It returns an error when the body is invalid or the encoded frame exceeds the size limit.
-func (fb FrameBuilder) NewHandshakeAnswer(compressions []fields.Compression) (frame.Frame, error) {
+func (fb FrameBuilder) NewHandshakeAnswer(compressions []fields.Compression, versions []fields.Version) (frame.Frame, error) {
 	f := frame.Frame{
 		RequestID: handshakeRequestID,
-		Body:      bodies.NewHandshakeAnswer(compressions),
+		Body:      bodies.NewHandshakeAnswer(compressions, versions),
 	}
 
 	if err := f.IsValid(); err != nil {

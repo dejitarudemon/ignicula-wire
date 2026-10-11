@@ -42,18 +42,21 @@ func TestFrameBuilder(t *testing.T) {
 		},
 		{
 			name:  "handshake answer empty",
-			build: func() (frame.Frame, error) { return fb.NewHandshakeAnswer(nil) },
+			build: func() (frame.Frame, error) { return fb.NewHandshakeAnswer(nil, nil) },
 			want:  frame.Frame{RequestID: 0, Body: bodies.HandshakeAnswer{}},
 		},
 		{
 			name:  "handshake answer deduplicates compressions",
-			build: func() (frame.Frame, error) { return fb.NewHandshakeAnswer(tooManyZstd) },
+			build: func() (frame.Frame, error) { return fb.NewHandshakeAnswer(tooManyZstd, nil) },
 			want:  frame.Frame{RequestID: 0, Body: bodies.HandshakeAnswer{Compressions: []fields.Compression{fields.Zstd}}},
 		},
 		{
 			name:  "handshake answer deduplicates few compressions",
-			build: func() (frame.Frame, error) { return fb.NewHandshakeAnswer(almostTooManyZstd) },
-			want:  frame.Frame{RequestID: 0, Body: bodies.HandshakeAnswer{Compressions: []fields.Compression{fields.Zstd}}},
+			build: func() (frame.Frame, error) { return fb.NewHandshakeAnswer(almostTooManyZstd, []fields.Version{1, 1}) },
+			want: frame.Frame{RequestID: 0, Body: bodies.HandshakeAnswer{
+				Compressions: []fields.Compression{fields.Zstd},
+				Versions:     []fields.Version{1},
+			}},
 		},
 
 		{
@@ -301,7 +304,7 @@ func TestFrameBuilder_LimitExceeded(t *testing.T) {
 		build func() (frame.Frame, error)
 	}{
 		{"handshake", func() (frame.Frame, error) { return fb.NewHandshake("", [32]byte{}, nil) }},
-		{"handshake answer", func() (frame.Frame, error) { return fb.NewHandshakeAnswer(nil) }},
+		{"handshake answer", func() (frame.Frame, error) { return fb.NewHandshakeAnswer(nil, nil) }},
 		{"ping", func() (frame.Frame, error) { return fb.NewPing(1) }},
 		{"ping answer", func() (frame.Frame, error) { return fb.NewPingAnswer(1) }},
 		{"read", func() (frame.Frame, error) { return fb.NewRead(1, fields.Key("key")) }},
